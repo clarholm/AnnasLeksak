@@ -18,11 +18,12 @@ By Jens Clarholm @jenslabs, jenslabs.com
 #define switchLeft 4
 #define DATA_PIN 7
 #define NUM_LEDS 6
+#define BRIGHTNESS 60
 
 
 //Define and initiate global variables
 int currentState = 0;
-int nrOfStates = 5;
+int nrOfStates = 9;
 boolean debug1 = true;
 int currentRedFromPot = 0;
 int currentGreenFromPot = 0;
@@ -32,7 +33,7 @@ int stateSwitchLeft;
 int stateSwitchMiddle;
 int stateSwitchRight;
 int currentSwitchValue;
-
+uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 // Create debounce objects for state buttons
 Bounce debouncer1 = Bounce(); 
 Bounce debouncer2 = Bounce(); 
@@ -53,7 +54,8 @@ void setup() {
   
   //Create Led object
   FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, NUM_LEDS);
-  
+  FastLED.setBrightness(BRIGHTNESS);
+
   //Define state change buttons with debounce.
   // Setup the first button with an internal pull-up :
   pinMode(nextStateButton,INPUT_PULLUP);
@@ -107,6 +109,82 @@ if (currentState == 0 || currentState == 1){
 if (currentState == 2 || currentState == 3){
     lightUpDiodeAllToNo(currentSwitchValue);
     }
+    
+if (currentState == 4 || currentState == 5){
+     gHue = gHue+5;
+    rainbow(currentSwitchValue);
+    }
+if (currentState == 6 || currentState == 7){
+     gHue = gHue+5;
+    //rainbow(currentSwitchValue);
+    confetti(currentSwitchValue);
+    }
+if (currentState == 8 || currentState == 9){
+     gHue = gHue+5;
+    //rainbow(currentSwitchValue);
+    sinelon(currentSwitchValue);
+    }
+}
+
+void sinelon(int diodeNumber)
+{
+  // a colored dot sweeping back and forth, with fading trails
+  fadeToBlackBy( leds, NUM_LEDS, 20);
+  int pos = beatsin16(13,0,NUM_LEDS);
+  leds[pos] += CHSV( gHue, 255, 192);
+      if (diodeNumber < 6){
+    for(int currentLed = 0; currentLed < NUM_LEDS; currentLed = currentLed + 1) {
+    if (currentLed  > diodeNumber){
+    leds[currentLed] = CRGB::Black;;
+    }   
+
+    }
+    }
+     if (diodeNumber == 7){
+      setAllLedsToColor(CRGB::Black);
+      }
+    FastLED.setBrightness(BRIGHTNESS);
+   FastLED.show(); 
+}
+
+void confetti(int diodeNumber) 
+{
+  // random colored speckles that blink in and fade smoothly
+  fadeToBlackBy( leds, NUM_LEDS, 10);
+  int pos = random16(NUM_LEDS);
+  leds[pos] += CHSV( gHue + random8(64), 200, 255);
+      if (diodeNumber < 6){
+    for(int currentLed = 0; currentLed < NUM_LEDS; currentLed = currentLed + 1) {
+    if (currentLed  > diodeNumber){
+    leds[currentLed] = CRGB::Black;;
+    }   
+
+    }
+    }
+    if (diodeNumber == 7){
+      setAllLedsToColor(CRGB::Black);
+      }
+    FastLED.setBrightness(BRIGHTNESS);
+   FastLED.show(); 
+}
+
+void rainbow(int diodeNumber) 
+{
+  // FastLED's built-in rainbow generator
+  fill_rainbow( leds, NUM_LEDS, gHue, 15);
+      if (diodeNumber < 6){
+    for(int currentLed = 0; currentLed < NUM_LEDS; currentLed = currentLed + 1) {
+    if (currentLed  > diodeNumber){
+    leds[currentLed] = CRGB::Black;;
+    }   
+
+    }
+    }
+    if (diodeNumber == 7){
+      setAllLedsToColor(CRGB::Black);
+      }
+    FastLED.setBrightness(BRIGHTNESS);
+   FastLED.show(); 
 }
 
 void lightUpDiodeNo(int diodeNumber){
@@ -257,6 +335,22 @@ void updateState(int stateChangeUpOrDown){
         Serial.println("State 2 indication code here!");
         displayCurrentStateByShowingColorsAndFlashing(CRGB::DarkTurquoise);
         break;
+     case 6:
+        Serial.println("State 2 indication code here!");
+        displayCurrentStateByShowingColorsAndFlashing(CRGB::Maroon);
+        break;        
+     case 7:
+        Serial.println("State 2 indication code here!");
+        displayCurrentStateByShowingColorsAndFlashing(CRGB::Maroon);
+        break;
+     case 8:
+        Serial.println("State 2 indication code here!");
+        displayCurrentStateByShowingColorsAndFlashing(CRGB::Coral);
+        break;        
+     case 9:
+        Serial.println("State 2 indication code here!");
+        displayCurrentStateByShowingColorsAndFlashing(CRGB::Coral);
+        break;
       default:
         Serial.println("No case available for current state.");
       }
@@ -264,7 +358,7 @@ void updateState(int stateChangeUpOrDown){
 
 void displayCurrentStateByShowingColorsAndFlashing(CRGB color){
   setAllLedsToColor(color);
-  delay(1000);
+  delay(300);
   /*
   int flashNrOfTimes = currentState;
   while(flashNrOfTimes>=0){
