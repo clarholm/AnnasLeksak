@@ -28,6 +28,10 @@ int currentRedFromPot = 0;
 int currentGreenFromPot = 0;
 int currentBlueFromPot = 0;
 CRGB CRGBValueReadFromPots;
+int stateSwitchLeft;
+int stateSwitchMiddle;
+int stateSwitchRight;
+int currentSwitchValue;
 
 // Create debounce objects for state buttons
 Bounce debouncer1 = Bounce(); 
@@ -39,6 +43,11 @@ CRGB leds[NUM_LEDS];
 void setup() {
   Serial.begin(9600);
   Serial.println("Start serial");
+  
+  pinMode(switchRight,INPUT_PULLUP);
+  pinMode(switchMiddle,INPUT_PULLUP);
+  pinMode(switchLeft,INPUT_PULLUP);
+  
   
  delay(1000);
   
@@ -86,12 +95,94 @@ void loop() {
   }
   
   readRGBValues();
-  setAllLedsToColor(CRGBValueReadFromPots);
-/*
-if (currentState == 0){
-    setAllLedsToColor(CRGB::LawnGreen);
+  readSwitches();
+  calculateCurrentSwitchValue();
+  Serial.print("Calculated current switch value: ");
+  Serial.println(currentSwitchValue);
+  //setAllLedsToColor(CRGBValueReadFromPots);
+
+if (currentState == 0 || currentState == 1){
+    lightUpDiodeNo(currentSwitchValue);
     }
-*/
+if (currentState == 2 || currentState == 3){
+    lightUpDiodeAllToNo(currentSwitchValue);
+    }
+}
+
+void lightUpDiodeNo(int diodeNumber){
+  
+    if (diodeNumber < 6){
+
+    for(int currentLed = 0; currentLed < NUM_LEDS; currentLed = currentLed + 1) {
+    if (currentLed == diodeNumber){
+    leds[currentLed] = CRGBValueReadFromPots;
+    }   
+    else leds[currentLed] = CRGB::Black;
+    } 
+    }
+    //Since I only have 6 LEDs I decided that all switches on is all diodes on.
+     else if(diodeNumber==6){
+      setAllLedsToColor(CRGBValueReadFromPots);
+      }
+    else setAllLedsToColor(CRGB::Black);
+   FastLED.show();
+}
+
+void lightUpDiodeAllToNo(int diodeNumber){
+  
+    if (diodeNumber < 6){
+    for(int currentLed = 0; currentLed < NUM_LEDS; currentLed = currentLed + 1) {
+    if (currentLed <= diodeNumber){
+    leds[currentLed] = CRGBValueReadFromPots;
+    }   
+    else leds[currentLed] = CRGB::Black;
+    } 
+    }
+    //Since I only have 6 LEDs I decided that all switches on is all diodes on.
+     else if(diodeNumber==6){
+      setAllLedsToColor(CRGBValueReadFromPots);
+      }
+    else setAllLedsToColor(CRGB::Black);
+   FastLED.show();
+}
+
+void calculateCurrentSwitchValue(){
+if (stateSwitchLeft==LOW && stateSwitchMiddle==LOW && stateSwitchRight==LOW){
+ currentSwitchValue = 7;
+}
+else if (stateSwitchLeft==LOW && stateSwitchMiddle==LOW && stateSwitchRight==HIGH){
+ currentSwitchValue = 0;
+}
+else if (stateSwitchLeft==LOW && stateSwitchMiddle==HIGH && stateSwitchRight==LOW){
+currentSwitchValue = 1;
+}
+else if (stateSwitchLeft==LOW && stateSwitchMiddle==HIGH && stateSwitchRight==HIGH){
+currentSwitchValue = 2;
+}
+else if (stateSwitchLeft==HIGH && stateSwitchMiddle==LOW && stateSwitchRight==LOW){
+currentSwitchValue = 3;
+}
+else if (stateSwitchLeft==HIGH && stateSwitchMiddle==LOW && stateSwitchRight==HIGH){
+currentSwitchValue = 4;
+}
+else if (stateSwitchLeft==HIGH && stateSwitchMiddle==HIGH && stateSwitchRight==LOW){
+currentSwitchValue = 5;
+}
+else if (stateSwitchLeft==HIGH && stateSwitchMiddle==HIGH && stateSwitchRight==HIGH){
+currentSwitchValue = 6;
+}
+}
+
+void readSwitches(){
+stateSwitchLeft = digitalRead(switchLeft);
+  Serial.print("State switch Left: ");
+  Serial.println(stateSwitchLeft);
+stateSwitchMiddle = digitalRead(switchMiddle);
+  Serial.print("State switch Middle: ");
+  Serial.println(stateSwitchMiddle);
+stateSwitchRight = digitalRead(switchRight);
+  Serial.print("State switch Right: ");
+  Serial.println(stateSwitchRight);
 }
 
 void readRGBValues(){
