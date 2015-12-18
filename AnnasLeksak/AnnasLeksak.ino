@@ -22,9 +22,12 @@ By Jens Clarholm @jenslabs, jenslabs.com
 
 //Define and initiate global variables
 int currentState = 0;
-int nrOfStates = 2;
+int nrOfStates = 5;
 boolean debug1 = true;
-
+int currentRedFromPot = 0;
+int currentGreenFromPot = 0;
+int currentBlueFromPot = 0;
+CRGB CRGBValueReadFromPots;
 
 // Create debounce objects for state buttons
 Bounce debouncer1 = Bounce(); 
@@ -47,13 +50,13 @@ void setup() {
   pinMode(nextStateButton,INPUT_PULLUP);
   // After setting up the button, setup the Bounce instance :
   debouncer1.attach(nextStateButton);
-  debouncer1.interval(5); // interval in ms
+  debouncer1.interval(50); // interval in ms
   
    // Setup the second button with an internal pull-up :
   pinMode(previousStateButton,INPUT_PULLUP);
   // After setting up the button, setup the Bounce instance :
   debouncer2.attach(previousStateButton);
-  debouncer2.interval(5); // interval in ms
+  debouncer2.interval(50); // interval in ms
 
 }
 
@@ -67,22 +70,40 @@ void loop() {
   int valuePreviousStateButton = debouncer2.read();
 
   // Turn on the LED if either button is pressed :
-  if ( valueNextStateButton == LOW || valuePreviousStateButton == LOW ) {
-    valuePreviousStateButton = HIGH;
+  if ( valueNextStateButton == LOW ) {
+        Serial.print("this is a printout indicating that the previous state button has been pressed. Millis: ");
+     Serial.println((int)millis);
+//    valuePreviousStateButton = HIGH;
     updateState(1);
   } 
- /*
+
   if ( valuePreviousStateButton == LOW ) {
-    delay(10);
-    Serial.print("this is a printout indicating that the previous state button has been pressed. Millis: ");
+    //delay(10);
+    Serial.print("this is a printout indicating that the next state button has been pressed. Millis: ");
      Serial.println((int)millis);
-     valuePreviousStateButton = HIGH;
+//valuePreviousStateButton = HIGH;
     updateState(0);
-  } 
-*/
-  if (currentState == 0){
+  }
+  
+  readRGBValues();
+  setAllLedsToColor(CRGBValueReadFromPots);
+/*
+if (currentState == 0){
     setAllLedsToColor(CRGB::LawnGreen);
     }
+*/
+}
+
+void readRGBValues(){
+int tempCurrentReadingRed = analogRead(colorPotentiometerRed);
+currentRedFromPot = map(tempCurrentReadingRed, 0, 1023, 0, 255);
+CRGBValueReadFromPots.red = currentRedFromPot;
+int tempCurrentReadingGreen = analogRead(colorPotentiometerGreen);
+currentGreenFromPot = map(tempCurrentReadingGreen, 0, 1023, 0, 255);
+CRGBValueReadFromPots.green = currentGreenFromPot;
+int tempCurrentReadingBlue = analogRead(colorPotentiometerBlue);
+currentBlueFromPot = map(tempCurrentReadingBlue, 0, 1023, 0, 255);
+CRGBValueReadFromPots.blue = currentBlueFromPot;
 
 }
 
@@ -127,9 +148,21 @@ void updateState(int stateChangeUpOrDown){
         break;
       case 1:
         Serial.println("State 1 indication code here!");
-        displayCurrentStateByShowingColorsAndFlashing(CRGB::Gold);
+        displayCurrentStateByShowingColorsAndFlashing(CRGB::HotPink);
         break;
       case 2:
+        Serial.println("State 2 indication code here!");
+        displayCurrentStateByShowingColorsAndFlashing(CRGB::Gold);
+        break;
+      case 3:
+        Serial.println("State 2 indication code here!");
+        displayCurrentStateByShowingColorsAndFlashing(CRGB::Gold);
+        break;
+      case 4:
+        Serial.println("State 2 indication code here!");
+        displayCurrentStateByShowingColorsAndFlashing(CRGB::DarkTurquoise);
+        break;        
+     case 5:
         Serial.println("State 2 indication code here!");
         displayCurrentStateByShowingColorsAndFlashing(CRGB::DarkTurquoise);
         break;
@@ -139,6 +172,9 @@ void updateState(int stateChangeUpOrDown){
   }
 
 void displayCurrentStateByShowingColorsAndFlashing(CRGB color){
+  setAllLedsToColor(color);
+  delay(1000);
+  /*
   int flashNrOfTimes = currentState;
   while(flashNrOfTimes>=0){
   setAllLedsToColor(color);
@@ -147,6 +183,7 @@ void displayCurrentStateByShowingColorsAndFlashing(CRGB color){
   delay(500);
   flashNrOfTimes = flashNrOfTimes-1;
   }
+  */
 }
  void setAllLedsToColor(CRGB color){
     for(int currentLed = 0; currentLed < NUM_LEDS; currentLed = currentLed + 1) {
