@@ -203,6 +203,7 @@ void lightUpDiodeNo(int diodeNumber){
       setAllLedsToColor(CRGBValueReadFromPots);
       }
     else setAllLedsToColor(CRGB::Black);
+      FastLED.setBrightness(BRIGHTNESS);
    FastLED.show();
 }
 
@@ -221,6 +222,7 @@ void lightUpDiodeAllToNo(int diodeNumber){
       setAllLedsToColor(CRGBValueReadFromPots);
       }
     else setAllLedsToColor(CRGB::Black);
+      FastLED.setBrightness(BRIGHTNESS);
    FastLED.show();
 }
 
@@ -374,5 +376,6 @@ void displayCurrentStateByShowingColorsAndFlashing(CRGB color){
     for(int currentLed = 0; currentLed < NUM_LEDS; currentLed = currentLed + 1) {
     leds[currentLed] = color;
     }
+      FastLED.setBrightness(BRIGHTNESS);
     FastLED.show();
     }
