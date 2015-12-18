@@ -8,22 +8,22 @@ By Jens Clarholm @jenslabs, jenslabs.com
 #include <Bounce2.h>
 #include "FastLED.h"
 
-#define nextStateButton 2
-#define previousStateButton 3
-#define colorPotentiometerRed A7//remember to define as A#
-#define colorPotentiometerGreen A6
-#define colorPotentiometerBlue A5
-#define switchRight 4
+#define nextStateButton 6
+#define previousStateButton 5
+#define colorPotentiometerRed A2//remember to define as A#
+#define colorPotentiometerGreen A1
+#define colorPotentiometerBlue A0
+#define switchRight 2
 #define switchMiddle 3
-#define switchLeft 2
-#define DATA_PIN 3
+#define switchLeft 4
+#define DATA_PIN 7
 #define NUM_LEDS 6
 
 
 //Define and initiate global variables
 int currentState = 0;
 int nrOfStates = 2;
-boolean debug1 = false;
+boolean debug1 = true;
 
 
 // Create debounce objects for state buttons
@@ -34,6 +34,9 @@ Bounce debouncer2 = Bounce();
 CRGB leds[NUM_LEDS];
 
 void setup() {
+  Serial.begin(9600);
+  Serial.println("Start serial");
+  
  delay(1000);
   
   //Create Led object
@@ -64,13 +67,19 @@ void loop() {
   int valuePreviousStateButton = debouncer2.read();
 
   // Turn on the LED if either button is pressed :
-  if ( valueNextStateButton == LOW ) {
+  if ( valueNextStateButton == LOW || valuePreviousStateButton == LOW ) {
+    valuePreviousStateButton = HIGH;
     updateState(1);
   } 
+ /*
   if ( valuePreviousStateButton == LOW ) {
+    delay(10);
+    Serial.print("this is a printout indicating that the previous state button has been pressed. Millis: ");
+     Serial.println((int)millis);
+     valuePreviousStateButton = HIGH;
     updateState(0);
   } 
-
+*/
   if (currentState == 0){
     setAllLedsToColor(CRGB::LawnGreen);
     }
@@ -86,7 +95,7 @@ void updateState(int stateChangeUpOrDown){
       }
     }
    else if (stateChangeUpOrDown==1){
-    newState=currentState-1;
+    newState=currentState+1;
     if (newState > nrOfStates){
       newState = 0;
       }
@@ -108,23 +117,24 @@ void updateState(int stateChangeUpOrDown){
  void showCurrentState(){
       
       if (debug1 == true){
-      Serial.print("Eneterd show current state, show current  ");
+      Serial.print("Eneterd show current state, current state is: ");
+      Serial.println(currentState);
       }     
       switch (currentState) {
-      case '0':
-        Serial.print("State 0 indication code here!");
+      case 0:
+        Serial.println("State 0 indication code here!");
         displayCurrentStateByShowingColorsAndFlashing(CRGB::HotPink);
         break;
-      case '1':
-        Serial.print("State 1 indication code here!");
+      case 1:
+        Serial.println("State 1 indication code here!");
         displayCurrentStateByShowingColorsAndFlashing(CRGB::Gold);
         break;
-      case '2':
-        Serial.print("State 2 indication code here!");
+      case 2:
+        Serial.println("State 2 indication code here!");
         displayCurrentStateByShowingColorsAndFlashing(CRGB::DarkTurquoise);
         break;
       default:
-        Serial.print("No case available for current state.");
+        Serial.println("No case available for current state.");
       }
   }
 
