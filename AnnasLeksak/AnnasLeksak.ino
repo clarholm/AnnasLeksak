@@ -267,13 +267,13 @@ stateSwitchRight = digitalRead(switchRight);
 
 void readRGBValues(){
 int tempCurrentReadingRed = analogRead(colorPotentiometerRed);
-currentRedFromPot = map(tempCurrentReadingRed, 0, 1023, 0, 255);
+currentRedFromPot = map(tempCurrentReadingRed, 0, 1023, 255, 0);
 CRGBValueReadFromPots.red = currentRedFromPot;
 int tempCurrentReadingGreen = analogRead(colorPotentiometerGreen);
-currentGreenFromPot = map(tempCurrentReadingGreen, 0, 1023, 0, 255);
+currentGreenFromPot = map(tempCurrentReadingGreen, 0, 1023, 255, 0);
 CRGBValueReadFromPots.green = currentGreenFromPot;
 int tempCurrentReadingBlue = analogRead(colorPotentiometerBlue);
-currentBlueFromPot = map(tempCurrentReadingBlue, 0, 1023, 0, 255);
+currentBlueFromPot = map(tempCurrentReadingBlue, 0, 1023, 255, 0);
 CRGBValueReadFromPots.blue = currentBlueFromPot;
 
 }
