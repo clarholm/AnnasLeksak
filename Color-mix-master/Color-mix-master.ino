@@ -24,7 +24,7 @@ By Jens Clarholm @jenslabs, jenslabs.com
 //Define and initiate global variables
 int currentState = 0;
 int nrOfStates = 9;
-boolean debug1 = true;
+boolean debug1 = false;
 int currentRedFromPot = 0;
 int currentGreenFromPot = 0;
 int currentBlueFromPot = 0;
